@@ -14,7 +14,9 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_REGION = os.getenv('AWS_REGION')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-
+#login details
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
 
 """
 This script logs into cedirates.com and scarpes data regarding fuel prices from several fuel stations in Ghana 
@@ -59,7 +61,7 @@ def get_data(url, scrape_url):
         List
     """
 
-    data = {"email":"booostsolutions@gmail.com","password":"God'salive1"}
+    data = {"email":EMAIL,"password":PASSWORD}
 
     data = json.dumps(data)
 
