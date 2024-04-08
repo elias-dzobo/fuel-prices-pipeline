@@ -18,6 +18,8 @@ S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 
+path = '/Users/eliasdzobo/Documents/data-eng/fuel-pipeline/Data'
+
 """
 This script logs into cedirates.com and scarpes data regarding fuel prices from several fuel stations in Ghana 
 """
@@ -37,14 +39,18 @@ def return_urls():
     Output: 
         String 
     """
+    date = datetime.now().strftime("%d-%m-%Y")
 
     date = date.split('-')
     date[1] = date[1][1]
+    date[0] = date[0][1]
 
     date = '-'.join(date)
 
     url = "https://cedirates.com/api/v1/auth/login"
-    scrape_url = "https://cedirates.com/api/v1/fuelPrices/{}".format(date) 
+    #scrape_url = "https://cedirates.com/api/v1/fuelPrices/{}".format(date) 
+
+    scrape_url = "https://cedirates.com/api/v1/fuelPrices/8-4-2024"
 
     return url, scrape_url
 
@@ -107,7 +113,7 @@ def create_datafile(data_list):
 
     filename = f'fuelprices_{date}.csv'
 
-    pd.DataFrame(fuel_data).to_csv(filename)
+    pd.DataFrame(fuel_data).to_csv(os.path.join(path, filename))
 
     return filename
 
@@ -140,7 +146,7 @@ if __name__ == '__main__':
 
     filename = create_datafile(data_list)
 
-    save2S3bucket(filename)
+    #save2S3bucket(filename)
 
 
 
