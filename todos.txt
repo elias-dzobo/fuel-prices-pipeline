@@ -1,0 +1,5 @@
+- run airflow orchestration 
+- figure out airflow ui login
+- read on clustering and partitions 
+- retrieve info for twitter bot template 
+- twitter bot implementation
