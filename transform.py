@@ -7,7 +7,6 @@ Transform Data from API
 """
 import os 
 import pandas as pd 
-from database import create_connection
 
 path = '/Users/eliasdzobo/Documents/data-eng/fuel-pipeline/Data'
 

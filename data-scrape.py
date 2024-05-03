@@ -1,11 +1,13 @@
 import requests as re
 import json 
-from datetime import datetime 
 import pandas as pd 
 import os
 from dotenv import dotenv_values
-import psycopg2
-
+from airflow.models.dag import DAG
+from airflow.decorators import task
+from airflow.utils.task_group import TaskGroup
+from helpers import * 
+from datetime import datetime, timedelta
 
 env = dotenv_values('.env')
 
@@ -16,43 +18,13 @@ env = dotenv_values('.env')
 EMAIL = env.get('EMAIL')
 PASSWORD = env.get('PASSWORD')
 
+#data save path [ chnage to s3 bucket]
 path = '/Users/eliasdzobo/Documents/data-eng/fuel-pipeline/Data'
 
 """
 This script logs into cedirates.com and scarpes data regarding fuel prices from several fuel stations in Ghana 
 """
-
-def format_date():
-
-    date = datetime.now().strftime("%d-%m-%Y")
-    date = datetime.now().strftime("%d-%m-%Y")
-
-    date = date.split('-')
-    
-    if date[0][0] == '0':
-        date[0] = date[0][1]
-
-    if date[1][0] == '0':
-        date[1] = date[1][1]
-    
-
-    date = '-'.join(date)
-
-    return date 
-
-def db_connection():
-    conn = psycopg2.connect(
-    dbname=env.get("DB_NAME"),
-    user=env.get("DB_USER"),
-    password=env.get("DB_PASSWORD"),
-    host=env.get("DB_HOST"),
-    port=env.get("DB_PORT")
-    )
-
-    return conn 
-
-
-
+@task()
 def return_urls():
     """
     A function to standardise and return a the login url and scrape url for each days prices 
@@ -73,6 +45,8 @@ def return_urls():
     return url, scrape_url
 
 
+
+@task()
 def get_data(url, scrape_url):
     """
     A function that makes a request to login and scrape from data source
@@ -108,6 +82,7 @@ def get_data(url, scrape_url):
 
         return data_list
 
+@task()
 def create_datafile(data_list):
     """
     A function that converts the scrape output into a csv file 
@@ -137,6 +112,7 @@ def create_datafile(data_list):
 
     return filename
 
+@task()
 def transform_data(filename):
     df = pd.read_csv(filename)
 
@@ -161,6 +137,7 @@ def transform_data(filename):
 
     return (date, avg_petrol, avg_diesel, min_petrol, min_diesel, max_petrol, max_diesel, min_petrol_station, min_diesel_station, max_petrol_station, max_diesel_station)
 
+#task()
 def save_to_postgres(filename):
     conn = db_connection()
     curr = conn.cursor()
@@ -187,10 +164,28 @@ def save_to_postgres(filename):
         return False 
 
 
+with DAG('fuel-pipeline', schedule_interval=timedelta(days=1)) as dag:
+    
+    with TaskGroup('fetch_data', tooltip='Extract data from API') as fetch_data:
+        url, scrape_url = return_urls()
+        data = get_data(url, scrape_url)
+
+    with TaskGroup('create_datafile', tooltip='Create CSV files for data') as createDatafile:
+        filename = create_datafile(data) 
+
+    with TaskGroup('transform_data', tooltip='Create data aggregates') as transformData:
+        values = transform_data(filename)
+
+    with TaskGroup('save_to_postgres', tooltip='Save aggregated data to psotgres databse') as save2postgres:
+        save_to_postgres(filename)
+
+    fetch_data >> createDatafile >> transformData >> save2postgres
 
 
 
-if __name__ == '__main__':
+
+
+""" if __name__ == '__main__':
     url, scrape_url = return_urls()
 
     print(url)
@@ -203,7 +198,7 @@ if __name__ == '__main__':
     path = os.path.join(path, file)
     save_to_postgres(path)
 
-    #filename = create_datafile(data_list)
+    #filename = create_datafile(data_list) """
 
 
 
