@@ -11,7 +11,9 @@ from datetime import datetime, timedelta
 
 env = dotenv_values('.env')
 
-
+"""
+This script logs into cedirates.com and scarpes data regarding fuel prices from several fuel stations in Ghana 
+"""
 
 
 #login details
@@ -21,9 +23,7 @@ PASSWORD = env.get('PASSWORD')
 #data save path [ chnage to s3 bucket]
 path = '/Users/eliasdzobo/Documents/data-eng/fuel-pipeline/Data'
 
-"""
-This script logs into cedirates.com and scarpes data regarding fuel prices from several fuel stations in Ghana 
-"""
+
 @task()
 def return_urls():
     """
@@ -114,6 +114,15 @@ def create_datafile(data_list):
 
 @task()
 def transform_data(filename):
+    """
+    A function that extract needed information from our data 
+
+    Input:
+        filename: String 
+
+    Returns:
+        tuple
+    """
     df = pd.read_csv(filename)
 
     date = format_date()
@@ -139,6 +148,15 @@ def transform_data(filename):
 
 #task()
 def save_to_postgres(filename):
+    """
+    A function that saves our extracted information to postgres
+
+    Input:
+        filename: Strig 
+
+    Returns:
+        Bool
+    """
     conn = db_connection()
     curr = conn.cursor()
 

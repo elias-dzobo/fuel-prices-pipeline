@@ -2,6 +2,10 @@ from datetime import datetime
 import psycopg2
 from dotenv import dotenv_values
 
+"""
+a group of utility functions 
+"""
+
 env = dotenv_values('.env')
 
 def format_date():

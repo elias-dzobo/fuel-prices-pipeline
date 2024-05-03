@@ -3,7 +3,9 @@ Transform Data from API
 
 - average diesel price 
 - average petrol price
-- save to postgress 
+- min petrol and diesel prices
+- max petrol and diesel prices
+- stations with the min and max diesel and petrol prices 
 """
 import os 
 import pandas as pd 
