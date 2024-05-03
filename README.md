@@ -1,16 +1,14 @@
-**[Fuel Prices Pipeline]
+# [Fuel Prices Pipeline]
 
-OBJECTIVE:\
+## OBJECTIVE:\
 The objective of this project is to build a data pipeline that gets data
 regarding the prices of fuel on a daily basis, saves it to a data
 warehouse and creates an automated tweet daily announcing the prices.
 
-ARCHITECTURE DIAGRAM
+## ARCHITECTURE DIAGRAM
+![](fuel.png)
 
-![](fuel-etl.png)
-
-CURRENT LIMITATIONS:\
-1.The pipeline implementation is incomplete\
-2.The pipeline has not yet been orchestrated to run at specific
-intervals (daily) 3.Twitter bot implementation is not complete\
-4.Minimal transformation ideas of the raw scraped data
+## Current Overview:\
+Currently the data is fetched from an API and saved locally, the data is then transformed to extract information that the avg fuel price and the 
+lowest and highest prices and the statiosn with those prices. This retrieved data is stored in psotgres and would be used to fill up a tweet template 
+that a twitter bot would tweet on a daily basis using airflow as an orchestrator. 
